@@ -1,0 +1,167 @@
+Day 01: https://github.com/badtuxx/CertifiedContainersExpert/tree/main/DescomplicandoKubernetes/day-1
+
+* container?
+  Unidade com o seus recursos isolados
+
+* container engine?
+  O Container Engine é o responsável por gerenciar as imagens e volumes, é ele o responsável por garantir 
+que os os recursos que os containers estão utilizando está devidamente isolados, a vida do container, storage, rede, etc.
+  Porém ele não fala diretamente com o Kernel.
+
+* container runtime?
+Container runtime é quem de fato de se comunica com o Kernel. Ele é divido em 3 tipos: Low Level, High level, Sandbox e Virtualized. 
+  Low-level: são os Container Runtime que são executados diretamente pelo Kernel, como o runc, o crun e o runsc.
+  High-level: são os Container Runtime que são executados por um Container Engine, como o containerd, o CRI-O e o Podman.
+  Sandbox: são os Container Runtime que são executados por um Container Engine e que são responsáveis por executar containers de forma 
+segura em unikernels ou utilizando algum proxy para fazer a comunicação com o Kernel. O gVisor é um exemplo de Container Runtime do tipo Sandbox.
+  Virtualized: são os Container Runtime que são executados por um Container Engine e que são responsáveis por executar containers de forma 
+segura em máquinas virtuais. A performance aqui é um pouco menor do que quando temos um sendo executado nativamente. 
+O Kata Containers é um exemplo de Container Runtime do tipo Virtualized.
+
+
+* OCI?
+  A OCI é uma organização sem fins lucrativos que tem como objetivo padronizar a criação de containers, para que possam ser executados em qualquer ambiente. 
+A OCI foi fundada em 2015 pela Docker, CoreOS, Google, IBM, Microsoft, Red Hat e VMware e hoje faz parte da Linux Foundation.
+  O principal projeto criado pela OCI é o runc, que é o principal container runtime de baixo nível, e utilizado por diferentes *Container Engines, como o Docker. 
+O runc é um projeto open source, escrito em Go e seu código está disponível no GitHub.
+
+* CNF?
+  É o acronimo de "Cloud Native Foudation", é uma orgranizacao que cuida de softwares como kubernetes e etc.
+  
+* Kubernetes?
+  É um orquestrador de containers. Inicialmente ele nasceu chamado "Borg" e foi desenvolvido e utilizado internamente pelo Google.
+  Mas com hype do docker, o Google decidiu abrir uma parte do código fonte para a comunidade, justamente a parte que orquestrava os containers e 
+com isso nasceu o Kubernetes. Depois ele foi doado para CNF, que é uma entidade sem fins lucrativos.
+
+* Tipos de nodes?
+  O kubernetes trabalha com dois tipos de nodes, sendo o "Control Plane" e o "Worker".
+  O Control Plane é o node responsável por monitorar e garantir o health do cluster.
+  O Worker é o node responsável por rodar as nossas aplicações.
+  
+* API Server: 
+  É um dos principais componentes do k8s. Este componente fornece uma API que utiliza JSON sobre HTTP para comunicação, 
+onde para isto é utilizado principalmente o utilitário kubectl, por parte dos administradores, para a comunicação com os demais nós,
+como mostrado no gráfico. 
+Estas comunicações entre componentes são estabelecidas através de requisições REST;
+
+* etcd: 
+  O etcd é um datastore chave-valor distribuído que o k8s utiliza para armazenar as especificações, status e configurações do cluster. 
+  Todos os dados armazenados dentro do etcd são manipulados apenas através da API. 
+  Por questões de segurança, o etcd é por padrão executado apenas em nós classificados como control plane no cluster k8s, 
+mas também podem ser executados em clusters externos, específicos para o etcd, por exemplo;
+
+* Scheduler: 
+  O scheduler é responsável por selecionar o nó que irá hospedar um determinado pod (a menor unidade de um cluster k8s - 
+não se preocupe sobre isso por enquanto, nós falaremos mais sobre isso mais tarde) para ser executado. 
+  Esta seleção é feita baseando-se na quantidade de recursos disponíveis em cada nó, como também no estado de cada um dos nós do cluster, 
+garantindo assim que os recursos sejam bem distribuídos. 
+  Além disso, a seleção dos nós, na qual um ou mais pods serão executados, também pode levar em consideração políticas definidas pelo usuário, 
+tais como afinidade, localização dos dados a serem lidos pelas aplicações, etc;
+
+* Controller Manager: 
+  É o controller manager quem garante que o cluster esteja no último estado definido no etcd. 
+  Por exemplo: se no etcd um deploy está configurado para possuir dez réplicas de um pod, é o controller manager quem irá 
+verificar se o estado atual do cluster corresponde a este estado e, em caso negativo, procurará conciliar ambos;
+
+* Kubelet: 
+  O kubelet pode ser visto como o alente do k8s que é executado nos nós workers. 
+  Em cada nó worker deverá existir um agente Kubelet em execução. 
+  O Kubelet é responsável por de fato gerenciar os pods que foram direcionados pelo controller do cluster, dentro dos nós, de forma que para isto
+o Kubelet pode iniciar, parar e manter os contêineres e os pods em funcionamento de acordo com o instruído pelo controlador do cluster;
+  Além disso, é importante entender que o kubelet não é um container, e sim um processo que roda nos workers.
+
+* Kube-proxy: 
+  Age como um proxy e um load balancer. Este componente é responsável por efetuar roteamento de requisições para os pods corretos, 
+como também por cuidar da parte de rede do nó;
+  
+  
+*  Portas que devemos nos preocupar:
+	CONTROL PLANE
+
+	Protocol	Direction	Port Range	Purpose	Used By
+	TCP	Inbound	6443*	Kubernetes API server	All
+	TCP	Inbound	2379-2380	etcd server client API	kube-apiserver, etcd
+	TCP	Inbound	10250	Kubelet API	Self, Control plane
+	TCP	Inbound	10251	kube-scheduler	Self
+	TCP	Inbound	10252	kube-controller-manager	Self
+	Toda porta marcada por * é customizável, você precisa se certificar que a porta alterada também esteja aberta.
+  
+	WORKERS
+
+	Protocol	Direction	Port Range	Purpose	Used By
+	TCP	Inbound	10250	Kubelet API	Self, Control plane
+	TCP	Inbound	30000-32767	NodePort	Services All
+	TCP Inbound 6783    Weave Net
+	TCP/UDP Inbound 6784    Weave Net
+	
+* Conceitos-chave do k8s:
+
+  É importante saber que a forma como o k8s gerencia os contêineres é ligeiramente diferente de outros orquestradores, 
+como o Docker Swarm, sobretudo devido ao fato de que ele não trata os contêineres diretamente, mas sim através de pods. 
+  Vamos conhecer alguns dos principais conceitos que envolvem o k8s a seguir:
+
+    Pod: 
+	É o menor objeto do k8s. Como dito anteriormente, o k8s não trabalha com os contêineres diretamente, mas organiza-os dentro de pods, 
+	que são abstrações que dividem os mesmos recursos, como endereços, volumes, ciclos de CPU e memória. Um pod pode possuir vários contêineres;
+
+    Deployment: 
+	É um dos principais controllers utilizados. O Deployment, em conjunto com o ReplicaSet, garante que determinado número de réplicas 
+	de um pod esteja em execução nos nós workers do cluster. 
+	Além disso, o Deployment também é responsável por gerenciar o ciclo de vida das aplicações, onde características associadas a aplicação, 
+	tais como imagem, porta, volumes e variáveis de ambiente, podem ser especificados em arquivos do tipo yaml ou json para posteriormente 
+	serem passados como parâmetro para o kubectl executar o deployment. 
+	Esta ação pode ser executada tanto para criação quanto para atualização e remoção do deployment;
+
+    ReplicaSets: 
+	É um objeto responsável por garantir a quantidade de pods em execução no nó;
+
+    Services: 
+	É uma forma de você expor a comunicação através de um ClusterIP, NodePort ou LoadBalancer para distribuir as requisições entre os 
+	diversos Pods daquele Deployment. 
+	Funciona como um balanceador de carga.	
+	
+	
+	
+Minikube:
+
+	* minikube start === cria o cluster
+	* minikube delete === deleta o cluster
+	
+kind:
+
+	* kind create cluster --name <CLUSTER_NAME> === cria o cluster
+	* kind create cluster --config <PATH_YAML_FILE> === cria um cluster seguindo as configurações do arquivo .yaml informado
+	* kind delete cluster --name <CLUSTER_NAME>=== deleta o cluster
+	
+kubectl:
+    * kubectl get nodes === retorna uma lista de nodes
+	* kubectl get pods (ou po) === retorna uma lista de pods do namespaces default
+	* kubectl get namespaces (ou ns) === retorna uma lista de namespaces
+	* kubectl get pods -n <NAMESPACE> === retorna uma lista de pods do namespace informado
+	* kubectl get pods -n <NAMESPACE> -o wide === retorna uma lista de pods do namespace informado, com muito mais detalhes
+	* kubectl get pods -A === retorna a lista de todos os pods do cluster
+	* kubectl get deployment (ou deploy) -A === retorna a lista de todos os deployments do cluster
+	* kubectl get service (ou svc) -A === retorna a lista de todos os services do cluster
+	* kubectl get replicaset (ou rs) -A === retorna a lista de todos os replicasets do cluster
+	
+	* kubectl describe pod <NOME> === retorna dados detalhados da pod informada
+	
+	* kubectl exec -ti <NOME_DA_POD> -- bash === acessa a o container da pod, caso tenha mais de um container, 
+	é preciso passar <NOME_DO_CONTAINER> depois do nome da pod no comando
+	* kubectl exec -ti <NOME_DA_POD> -- ls <PATH> === executa um comando linux dentro do container da pod, esse comando pode ser qualquer coisa
+	
+	* kubectl expose pods <NOME> --type NodePort === cria uma service do tipo NodePort expondo a porta da pod
+	
+	* kubectl run --image <IMAGEM> <NOME_DA_POD> === cria um pod, com a imagem informada e com o nome informado
+	* kubectl run --image <IMAGEM> -- port <PORTA> === cria uma pod, com o nome e a porta informado
+	* kubectl run --image <IMAGEM> -- port <PORTA> <NOME> --dry-run=client === finge que cria um pod com as informações passadas
+	* kubectl run --image <IMAGEM> -- port <PORTA> <NOME> --dry-run=client -o <FORMATO> > <NOME_DO_ARQUIVO_COM_FORMATO> === 
+	simula a criação para gerar um output com as informações passadas
+	Exemplo: k run --image nginx --port 80 nginx --dry-run=client -o yaml > ~/kubernetes-kind/descomplicando-kubernetes/day-1/pod.yaml
+	
+	* kubectl delete pod <NOME_DA_POD> === deleta o pod
+	* kubectl delete service <NOME> === deleta a service informada
+	
+	* kubectl apply -f <NOME_DO_ARQUIVO> === cria componente utilizando o arquivo informado
+	
+	
