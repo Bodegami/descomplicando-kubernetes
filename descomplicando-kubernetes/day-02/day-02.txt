@@ -1,0 +1,44 @@
+
+kind:
+
+  * kukectl get pods -n <NAMESPACE> === retorna uma lista de pods do namespace informado.
+  * kubectl get pods --all-namespaces === retorna uma lista de todos os pods de todos os namespaces
+  * kubectl describe pods <POD> === retorna os detalhes do pod informado
+  * kubectl get pods <POD> -o yaml === retorna os detalhes do pod informado no formato .yaml
+  * kubectl get pods <POD> -o yaml > <PATH_COM_NOME_DO_ARQUIVO> === salva os detalhes do pod num arquivo .yaml no path e com o nome indicado
+  * kubectl get pods -o wide === retorna uma lista de pods detalhada
+  * kubectl get pods -L <NOME_DA_LABEL> === retorna uma lista de pods com labels
+  * kubectl get pods -l <NOME_DA_LABEL> (=, ==, !=) <VALOR_ESPERADO> === retorna uma lista de pods da label informada e com o valor esperado. 
+  Aceita os operadores de igual e diferente. Ex: kubectl get pods -l run=giropops
+  * kubectl delete pods <NOME> === deleta o pod informado
+  * kubectl run <NOME> --image <IMAGEM> --port <PORTA> -n <NAMESPACE> === cria um pod com o nome, a imagem, a porta e no namespace informado 
+  com os parametros informados
+  * kubectl run <NOME> -ti --image <alpine> === cria uma pod com a imagem do "alpine" e com o nome informado. Aqui utilizamos os comandos
+  -i e -t, quem podem ser passados como "-ti". Basicamente estamos abilitando o terminal do container e permitindo a iteracao com ele.
+  * kubectl attach <POD_NAME> -c <CONTAINER_NAME> -ti === anexa um terminal e permite a interacao a um container. Caso o container tenha um 
+  "daemon" ou "serviço" em execução, não será possivel iterar utilizando o terminal, pois o terminal ficara associado ao processo em execução dentro
+  do container e sem o TTY.
+  * kubectl exec -ti <CONTAINER_NAME> -- bash === permite conectar a um container e executar um comando utilizando o terminal informado.
+  * kubectl exec <CONTAINER_NAME> -- <COMANDO> === executa o comando direto no container informado
+  
+  *** Por "default" não há restrições de comunicação entre os pods, por isso eles se conversam.
+  
+  * kubectl describe <SERVICE> <NAME> === retorna os detalhes do serviço com o nome informado
+  * kubectl logs <NAME> === retorna os logs do recurso informado
+  * kubectl logs <NAME> -f === retorna os logs do recurso e fixa o terminal retornando os logs atualizados
+  * kubectl logs <POD_NAME> -c <CONTAINER_NAME> === retorna os logs de um container especifico da pod informada
+  * kubectl get pods -o wide -w === retorna a lista de pods em execução e trava a tela atualizando a cada nova informação
+  
+  * Executando teste de strees no container:
+  - acesse a pod/container == kubectl exec -it <NAME> -- bash
+  - atualize os pacotes e instale o stress == apt update && apt install -y stress
+  - execute o teste de stress de cpu == stress --vm 1 cpu <CPU>
+  - execute o teste de stress de memoria == stress --vm 1 --vm-bytes <MEMORIA>
+  - exemplos:
+    stress --vm 1 --cpu 1
+	stress --vm 1 --vm-bytes 128M
+	
+
+  ** É importante lembrar que o diretorio "emptyDir" garante o armazenamento dos dados apenas nas situações onde o container é reiniciado.
+ 
+  
