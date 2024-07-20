@@ -1,0 +1,25 @@
+
+
+  * kubectl get deployments === retorna uma lista dos deployments
+  * kubectl get deployments -o wide === retorna uma lista dos deployments com mais detalhes
+  * kubectl get deployment -o yaml === retorna os detalhes de um deployment no formato yaml
+  * kubectl get pods -l <LABEL_KEY>=<LABEL_VALUE> === retorna uma lista filtrada de pods com a label informada
+  * kubectl get replicasets === retorna uma lista de replicasets
+  * kubectl describe deployments.apps <NAME> === retorna a descrição de um deployment
+  * kubectl get deployments <NAME> -o yaml > temp.yaml === recupera todas as informações de um deployment em yaml e salva em um arquivo
+  * kubectl create deployment --image <IMAGEM> --replicas <QTD_REPLICAS> <DEPLOYMENT_NAME> --dry-run=client -o yaml > <PATH/NOME> === 
+  cria um arquivo de deployment com as configurações informadas
+  * kubectl create namespace <NAME> === cria um namespace com o nome informado
+  * kubectl create namespace <NAME --dry-run=client -o yaml > <PATH/NOME_ARQ> === cria um arquivo com informações necessarias para criar um namespace
+  * kubectl get deployments -n <NAMESPACE> === retorna a lista de deployments do namespace informado 
+  * kubectl rollout status deployment -n <NAMESPACE> <DEPLOYMENT> === retorna o status do rollout de um deployment
+  * kubectl rollout undo "DEPLOYMENT", "DAEMONSET", "STATEFULSET" <NAME> === faz o rollback para a revisao anterior
+  * kubectl rollout history deployment <NAME> === retorna uma lista de revisoes, ou seja, mudanças do deployment
+  * kubectl rollout history deployment <NAME> --revision <NUMERO> === retorna os detalhes da revisao
+  * kubectl rollout undo deployment -n <NAMESPACE> <DEPLOYMENT> --to-revision <NUMERO> === faz o rollback para versao da revisao informada
+  * kubectl rollout pause deployment -n <NAMESPACE> <DEPLOYMENT> === pausa a execucao de um deployment 
+  * kubectl rollout resume deployment -n <NAMESPACE> <DEPLOYMENT> === inicia a execucao de um deployment 
+  * kubectl rollout restart deployment -n <NAMESPACE> <DEPLOYMENT> === restarta toda a execucao de um deployment 
+  * kubectl scale deployment -n <NAMESPACE> --replicas <QUANTIDADE> <DEPLOYMENT> === faz o scale para cima ou para baixo de pods de um deployment
+  
+  

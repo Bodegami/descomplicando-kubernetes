@@ -1,0 +1,26 @@
+# O recreate mata todos os pods e depois cria com a nova atualizacao
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: nginx-deployment
+  name: nginx-deployment
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: nginx-deployment
+  strategy: 
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: nginx-deployment
+    spec:
+      containers:
+      - image: nginx:1.14.0
+        name: nginx
+        resources: {}
+status: {}
